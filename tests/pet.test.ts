@@ -1,5 +1,6 @@
 import {strict as assert} from 'assert';
 import { PetController } from './api/controller/pet.controller';
+import { definitions } from '../.temp/types'
 
 const pet = new PetController();
 
@@ -22,23 +23,24 @@ describe('Pet', () => {
 
         body =  await pet.findByStatus(['pending','available'])
         assert(body.length > 0);
-        assert(body.some( (pet: any) => pet.status === 'available'))
-        assert(body.some( (pet: any) => pet.status === 'pending'))
-        assert(!body.some( (pet: any) => pet.status === 'sold'))
+        assert(body.some( pet => pet.status === 'available'))
+        assert(body.some( pet => pet.status === 'pending'))
+        assert(!body.some( pet => pet.status === 'sold'))
     })
 
     it('can be received by tag',async () => {
         const body = await pet.findByTags('tag1');
         assert(body.length > 0);
         assert(body.every(
-            (pet:any) => pet.tags.some(
-                (tag: any) => tag.name === 'tag1')
+            pet => pet.tags!.some(
+                tag => tag.name === 'tag1')
                 )
             )
     })
 
     it('can be added, updated and deleted', async() => {
-        const petToCreate = {
+        //Omit - create new type without selected key
+        const petToCreate: Omit<definitions['Pet'], 'id'> = {
             "category": {
                 "id": 0,
                 "name": "string"
@@ -60,14 +62,13 @@ describe('Pet', () => {
             ...petToCreate,
             id: addedPet.id
         }, `Expected created pat to mathc data used upon creation`);
-
-        const foundAddedPet = await pet.getById(addedPet.id);
+        const foundAddedPet = await pet.getById(addedPet.id!);
         assert.deepEqual(foundAddedPet, {
             ...petToCreate,
             id: addedPet.id
         }, `Expected found pet to math created pet`);
 
-        const newerPet = {
+        const newerPet: definitions['Pet'] = {
             "id": addedPet.id,
             "category": {
                 "id": 1,
@@ -88,7 +89,7 @@ describe('Pet', () => {
         const updatedPet = await pet.update(newerPet);
         assert.deepEqual(updatedPet, newerPet, `Expected updated pet to equal data used upon updating`);
 
-        await pet.delete(addedPet.id)
+        await pet.delete(addedPet.id!)
         //TODO: assert 404 error
     });
 })
