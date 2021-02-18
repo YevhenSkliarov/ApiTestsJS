@@ -45,7 +45,7 @@ export class PetController {
             await new JsonRequest()
             .url(`http://localhost/v2/pet/${id}`)
             .method('DELETE')
-            .send<definitions['ApiResponse']>()
+            .send<definitions['AbstractApiResponse']>()
         ).body
 
       }

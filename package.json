@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Api Tests",
   "scripts": {
-
+    "postinstall": "npm run retest",
+    "pretest": "openapi-typescript http://localhost/v2/swagger.json --output ./.temp/types.ts",
     "test": "mocha --timeout 10000 --require ts-node/register ./tests/**/*.test.ts"
   },
   "author": "",
